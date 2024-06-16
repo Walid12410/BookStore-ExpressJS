@@ -1,4 +1,4 @@
-const { User } = require("../models/User");
+const { User, validateChangePassword } = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcryput = require("bcryptjs");
 const nodemailer = require("nodemailer");
@@ -65,13 +65,12 @@ module.exports.sendForgotPasswordLink = async (req, res) => {
         transporter.sendMail(maiilOptions, function (error, success) {
             if (error) {
                 console.log(error);
+                res.status(500).json({message: "Something went wrong"});
             } else {
                 console.log("Email send:" + success.response);
+                res.render("link-send");
             }
         });
-
-
-        res.render("link-send");
 
     } catch (error) {
         console.log(error);
@@ -119,7 +118,11 @@ module.exports.getResetPasswordView = async (req, res) => {
 */
 
 module.exports.resetThePassword = async (req, res) => {
-    // TODO : Validation
+    const { error} = validateChangePassword(req.body);
+    if(error){
+        return res.status(400).json({message: error.details[0].message});
+    }
+    
     try {
         const user = await User.findById(req.params.userId);
         if (!user) {

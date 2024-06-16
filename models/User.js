@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
+const passwordComplexity = require("joi-password-complexity");
 
 
 const UserSchema = new mongoose.Schema({
@@ -23,7 +24,7 @@ const UserSchema = new mongoose.Schema({
         type : String,
         required : true,
         trim: true,
-        minLength : 6,
+        minLength : 8,
     },
     isAdmin: {
         type: Boolean,
@@ -50,12 +51,20 @@ function validateLoginUser(obj){
     return schema.validate(obj);
 }
 
+// Validate Change Password
+function validateChangePassword(obj){
+    const schema = Joi.object({
+        password: passwordComplexity().required(),
+    });
+    return schema.validate(obj);
+}
+
 // Validate Register User
 function validateRegistorUser(obj){
     const schema = Joi.object({
         email : Joi.string().trim().min(5).max(100).required().email(),
         username : Joi.string().trim().min(2).max(200).required(),
-        password: Joi.string().trim().min(6).required(),
+        password: passwordComplexity().required(),
     });
     return schema.validate(obj);
 }
@@ -65,7 +74,7 @@ function validateUpateUser(obj){
     const schema = Joi.object({
         email : Joi.string().trim().min(5).max(100).email(),
         username : Joi.string().trim().min(2).max(200),
-        password: Joi.string().trim().min(6),
+        password: passwordComplexity().required(),
     });
     return schema.validate(obj);
 }
