@@ -5,27 +5,28 @@ require("dotenv").config();
 const connectToDB = require("./config/db");
 
 
-
 //dotenv.config();
-
 
 // Connection to database
 connectToDB();
-
-
 
 // Init App
 const app = express();
 
 // Apply Middlewares
 app.use(express.json());
+app.use(express.urlencoded({extended: false}));
 app.use(logger);
 
-app.use("/api/books", require("./routes/books"));
-app.use("/api/authors",  require("./routes/authors"));
-app.use("/api/auth",require("./routes/auth"));
-app.use("/api/users", require("./routes/users"));
 
+app.set('view engine', 'ejs');
+
+//Route
+app.use("/api/books",require("./routes/books"));
+app.use("/api/authors",require("./routes/authors"));
+app.use("/api/auth",require("./routes/auth"));
+app.use("/api/users",require("./routes/users"));
+app.use("/password",require("./routes/password"));
 
 // Error Handler Middlewares
 app.use(notFound);
